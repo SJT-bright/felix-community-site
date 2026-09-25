@@ -1,0 +1,24 @@
+body.career-intro-active { overflow: hidden; }
+.community-masthead { position: fixed; top: 0; left: 5%; right: 5%; height: 100px; display: flex; align-items: center; justify-content: space-between; z-index: 100; background: #030711c9; backdrop-filter: blur(14px); border-bottom: 1px solid #bbd6f126; }
+.community-masthead a { color: #e9eff5; text-decoration: none; }
+.community-brand { display: flex; align-items: center; gap: 20px; }
+.community-brand > span:first-child { font: italic 38px Didot, Georgia, serif; }
+.community-brand small { color: #9ecee8; }
+.community-brand-caption { border-left: 1px solid #bbd6f126; padding-left: 20px; font-size: 10px; letter-spacing: .18em; color: #a4b4c3; }
+.community-masthead nav { display: flex; gap: 30px; font-size: 12px; }
+.community-masthead a:focus-visible { outline: 2px solid #9ecee8; outline-offset: 6px; }
+#image-archive, #portfolio-gallery, #project-showcase, #community-contact { scroll-margin-top: 115px; }
+.intro-center-hint { position: absolute; inset: 45% 10% auto; text-align: center; color: #eef5ff; text-shadow: 0 2px 10px #000; pointer-events: none; }
+@media(max-width:600px) { .community-masthead { height: 76px; left: 4%; right: 4%; } .community-brand-caption { display: none; } .community-brand > span:first-child { font-size: 27px; } .community-masthead nav { gap: 10px; font-size: 10px; } .community-masthead nav a:nth-child(3) { display: none; } }
+.opening-content { position: relative; }
+felix-opening { display: block; min-height: 100svh; }
+.career-intro { position: fixed; inset: 0; z-index: 10000; background: #030710; opacity: 1; transition: opacity .8s ease, transform .8s ease; }
+.career-intro.is-leaving { opacity: 0; transform: scale(1.06); pointer-events: none; }
+.career-intro video { width: 100%; height: 100%; object-fit: cover; }
+.career-intro-controls { position: absolute; bottom: max(28px, env(safe-area-inset-bottom)); right: 5vw; left: 5vw; display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+.career-intro-controls button { color: #eef5ff; background: #07111bcc; border: 1px solid #c8dfff55; border-radius: 30px; padding: 12px 20px; cursor: pointer; }
+.opening-star-bridge { height: clamp(100px, 20vh, 220px); position: relative; overflow: hidden; background: transparent; }
+.opening-star-bridge span { display: none; }
+.opening-star-bridge span:nth-child(2) { transform: translate(35px, 17px); background-size: 191px 117px; opacity: .6; }
+.opening-star-bridge span:nth-child(3) { transform: translate(71px, 31px); background-size: 257px 157px; opacity: .35; }
+@media (prefers-reduced-motion: reduce) { .career-intro { transition: none; } }

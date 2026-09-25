@@ -1,0 +1,19 @@
+.career-nav{position:relative;z-index:15;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.25rem clamp(1.25rem,5vw,5rem);background:#050d1d;color:#dcecff;border-bottom:1px solid #274056;font-size:.9rem}
+.career-nav div{display:flex;gap:clamp(.8rem,3vw,2rem)}.career-nav a{text-decoration:none;color:inherit;min-height:44px;display:inline-flex;align-items:center}
+.career-nav a:hover{color:#8edfff}.career-nav a:focus-visible,.career-button:focus-visible{outline:2px solid #8edfff;outline-offset:5px}
+.profile-landing__layout{margin:clamp(3rem,10svh,7rem) auto 2rem}.profile-landing__copy{max-inline-size:43rem}
+.career-section{position:relative;z-index:2;max-width:1280px;margin:auto;padding:clamp(4rem,9vw,8rem) clamp(1.25rem,5vw,4rem);color:#dce7f4;scroll-margin-top:2rem}
+.career-section h2{font-size:clamp(2rem,4vw,3.5rem);font-weight:500;line-height:1.2;letter-spacing:-.025em;margin:.8rem 0 1.5rem;text-wrap:balance}
+.career-kicker,.career-role{color:#9adcf6}.career-kicker{margin:0;font-size:.9rem}.career-lead{max-width:65ch;line-height:1.85;color:#b5c9dd;font-size:1.05rem}
+.career-experiences{margin-top:3rem}.career-experiences article{display:grid;grid-template-columns:1fr 1.7fr;gap:2rem;border-top:1px solid #34485c;padding:2rem 0}
+.career-experiences h3{font-size:1.45rem;margin:.8rem 0}.career-role{font-size:.85rem;margin:0}
+.career-experiences article p:not(.career-role){margin:0;line-height:1.9;color:#c0d0e2;max-width:65ch}
+.career-experiences ul{list-style:none;padding:0;margin:1.2rem 0 0;display:flex;gap:1.2rem;flex-wrap:wrap;color:#8cc6e2;font-size:.82rem}
+.career-button{display:inline-flex;justify-content:center;align-items:center;min-height:44px;padding:.7rem 1.15rem;border:1px solid #6592ae;border-radius:8px;background:#0a2132;color:#e3f2ff;text-decoration:none;font:inherit;cursor:pointer}
+.career-button:hover{background:#13344c}.career-contact{border-top:1px solid #34485c}.career-contact-line{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-top:2rem}.career-contact-line strong{overflow-wrap:anywhere}.career-status{min-height:1.5em;color:#9adcf6}.career-contact small{color:#a9bed4}
+.profile-landing__footer a{text-decoration:none}
+.curation-note,.github-projects__availability{max-width:65ch;color:#b5c9dd;font-size:.95rem;line-height:1.85;margin:1rem 0 0}
+.github-projects__section{border-top:1px solid #466079;padding-top:clamp(3rem,6vw,5rem);margin-top:clamp(4rem,8vw,7rem)}
+.github-projects__availability{grid-column:1 / -1}
+@media(max-width:600px){.career-experiences article{grid-template-columns:1fr;gap:1.1rem}.career-nav{flex-wrap:wrap;gap:0;padding-block:.5rem}.career-nav div{width:100%;justify-content:space-between}.career-contact-line{align-items:flex-start}.profile-landing__layout{margin-top:3rem}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
