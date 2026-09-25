@@ -76,6 +76,8 @@ function createCanvasParticles(canvas,config,onReady){
   const ctx=canvas.getContext('2d',{alpha:true});
   if(!ctx)throw new Error('Canvas 2D unavailable');
   const bandWidth=Math.min(1.6,Math.max(.9,Number(config.portalBandWidth)||1.38));
+  const travelSpeed=Math.min(.18,Math.max(.04,Number(config.streamTravelSpeed)||.095));
+  const spiralTwist=Math.min(2.2,Math.max(.5,Number(config.streamSpiralTwist)||1.4));
   let w=1,h=1,dpr=1,frame=0,last=0,time=0,speed=1,progress=0,target=0,holding=false,active=true,disposed=false;
   let pointerX=0,pointerY=0,heat=0,rendered=false;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -104,14 +106,14 @@ function createCanvasParticles(canvas,config,onReady){
     const warm=start.map((v,i)=>Math.round([255,244,215][i]*.71+(v+(end[i]-v)*tint)*.29)).join(',');
     ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
     const halo=ctx.createRadialGradient(cx,cy,radius*.72,cx,cy,radius*2.6);
-    halo.addColorStop(0,`rgba(${color},.07)`);halo.addColorStop(.4,`rgba(${color},.09)`);halo.addColorStop(1,`rgba(${color},0)`);
+    halo.addColorStop(0,`rgba(${color},.04)`);halo.addColorStop(.4,`rgba(${color},.045)`);halo.addColorStop(1,`rgba(${color},0)`);
     ctx.fillStyle=halo;ctx.fillRect(0,0,w,h);
     for(const [x,y,b] of stars){ctx.fillStyle=`rgba(${color},${.12+b*.3})`;ctx.fillRect(x*w,y*h,.6+b,.6+b);}
     const project=(x,y,z)=>{const k=1;return [cx+(x*.925+y*.38)*radius/3,cy+(y*.925-x*.38)*radius/3,k];};
     const smooth=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t);};
     const corona=ctx.createRadialGradient(cx,cy,radius*.68,cx,cy,radius*1.48);
-    corona.addColorStop(0,`rgba(${warm},0)`);corona.addColorStop(.25,`rgba(${warm},.04)`);
-    corona.addColorStop(.48,`rgba(${warm},.14)`);corona.addColorStop(.72,`rgba(${warm},.07)`);
+    corona.addColorStop(0,`rgba(${warm},0)`);corona.addColorStop(.25,`rgba(${warm},.018)`);
+    corona.addColorStop(.48,`rgba(${warm},.075)`);corona.addColorStop(.72,`rgba(${warm},.035)`);
     corona.addColorStop(1,`rgba(${warm},0)`);
     ctx.globalCompositeOperation='lighter';ctx.fillStyle=corona;ctx.fillRect(0,0,w,h);
     const drawGlowFlow=near=>{
@@ -123,12 +125,12 @@ function createCanvasParticles(canvas,config,onReady){
       };
       const left=project(-extent,flowY(-extent)),right=project(extent,flowY(extent));
       const light=ctx.createLinearGradient(left[0],left[1],right[0],right[1]);
-      const strength=near?.15:.12;
+      const strength=near?.05:.055;
       light.addColorStop(0,`rgba(${warm},0)`);light.addColorStop(.2,`rgba(${warm},${strength})`);
       light.addColorStop(.5,`rgba(${warm},${strength*1.25})`);light.addColorStop(.8,`rgba(${warm},${strength})`);
       light.addColorStop(1,`rgba(${warm},0)`);
       ctx.save();ctx.globalCompositeOperation='lighter';ctx.strokeStyle=light;ctx.lineWidth=radius*(near?bandWidth/3:.24);
-      ctx.lineCap='round';ctx.shadowColor=`rgba(${warm},.48)`;ctx.shadowBlur=radius*.13;
+      ctx.lineCap='round';ctx.shadowColor=`rgba(${warm},.18)`;ctx.shadowBlur=radius*.08;
       ctx.beginPath();for(let i=0;i<=48;i++){
         const x=-extent+extent*2*i/48,[sx,sy]=project(x,flowY(x));
         if(i)ctx.lineTo(sx,sy);else ctx.moveTo(sx,sy);
@@ -141,14 +143,14 @@ function createCanvasParticles(canvas,config,onReady){
       points.push({pos:project(Math.cos(angle)*r,Math.sin(angle)*r,0),depth:0,white:true,size:1.5+c*1.3,alpha:.34+d*.55});
     }
     for(const [a,b,c,d] of goldRing){
-      const angle=a*Math.PI*2+time*.10,lens=Math.pow(Math.abs(Math.sin(angle)),.78);
+      const angle=a*Math.PI*2+time*(.10+.045*(1-b))+b*.28,lens=Math.pow(Math.abs(Math.sin(angle)),.78);
       const r=2.31+Math.pow(b,1.22)*(1.00+.18*lens)+Math.sin(angle*7-time*.27)*.035;
       points.push({pos:project(Math.cos(angle)*r,Math.sin(angle)*r,0),depth:0,size:1.8+c*1.5,alpha:(.27+.65*lens)*(.49+d*.51)*(1-b*.40)});
     }
     for(const [a,b,c,d] of haze){
-      const angle=a*Math.PI*2+time*.10,lens=Math.pow(Math.abs(Math.sin(angle)),.65);
+      const angle=a*Math.PI*2+time*(.085+.035*(1-b))+b*.22,lens=Math.pow(Math.abs(Math.sin(angle)),.65);
       const r=2.25+Math.pow(b,1.08)*(1.78+.28*lens);
-      points.push({pos:project(Math.cos(angle)*r,Math.sin(angle)*r,0),depth:0,size:3+c*2.4,alpha:(.042+.16*lens)*(.55+.45*d)*(1-b*.60),haze:true});
+      points.push({pos:project(Math.cos(angle)*r,Math.sin(angle)*r,0),depth:0,size:2+c*1.4,alpha:(.035+.12*lens)*(.55+.45*d)*(1-b*.60),haze:true});
     }
     for(const [a,b,c,d] of disk){
       const lane=Math.floor(c*12),r=2.93+Math.pow(b,1.24)*4.67;
@@ -167,8 +169,9 @@ function createCanvasParticles(canvas,config,onReady){
       points.push({pos:project(Math.cos(angle)*r,Math.sin(angle)*r*.20,0),depth:0,size:1.4+c*1.3,alpha:.12+d*.22,dark:true});
     }
     for(const [a,b,c,d] of ribbon){
-      const x=(a-.5)*22,reach=Math.abs(x),wing=smooth(3.5,10,reach),lane=Math.floor(c*7)-3;
-      const offset=lane*(.065+.15*wing*wing)+(b-.5)*(.12+.28*wing);
+      const life=((a-time*(travelSpeed*.60+d*.012))%1+1)%1;
+      const x=(life-.5)*22,reach=Math.abs(x),wing=smooth(3.5,10,reach),lane=Math.floor(c*7)-3;
+      const offset=lane*(.065+.15*wing*wing)+(b-.5)*(.12+.28*wing)+Math.sin(x*spiralTwist-time*.65+c*Math.PI*2)*(.09+.12*wing);
       const curve=.014*x*x+Math.sin(x*.42-time*.16)*.085+Math.sign(x)*.42*wing*wing;
       const fade=1-Math.min(1,Math.max(0,(reach-8.5)/2.5));
       points.push({pos:project(x,-.15+curve+offset,0),depth:0,size:1.7+d*1.4,alpha:(.26+d*.43)*fade*(1-.08*Math.abs(lane))});
@@ -182,10 +185,11 @@ function createCanvasParticles(canvas,config,onReady){
       points.push({pos:project(x,-.15+curve+offset,0),depth:0,size:1.7+c*1.2,alpha});
     }
     for(const [a,b,c,d] of front){
-      const life=((a-time*(.095+d*.018))%1+1)%1,x=(life-.5)*16.8;
+      const life=((a-time*(travelSpeed+d*.018))%1+1)%1,x=(life-.5)*16.8;
       const wing=smooth(3.2,8.4,Math.abs(x));
-      const breadth=bandWidth*(.78+.22*c)+.23*Math.min(1,Math.max(0,(Math.abs(x)-2.5)/5.9));
-      const spread=(b-.5)*breadth+(Math.floor(c*7)-3)*.09*wing*wing;
+      const breadth=bandWidth+.23*Math.min(1,Math.max(0,(Math.abs(x)-2.5)/5.9));
+      const radius=Math.sqrt(b)*breadth*.5,phase=c*Math.PI*2+x*spiralTwist-time*.65;
+      const spread=radius*Math.cos(phase)+(Math.floor(c*7)-3)*.09*wing*wing;
       const y=-.13+.020*x*x+Math.sign(x)*.33*wing*wing+spread+Math.sin(x*.46-time*.20)*.065;
       const fade=1-Math.min(1,Math.max(0,(Math.abs(x)-6.7)/1.7));
       points.push({pos:project(x,y,0),depth:1,size:1.8+d*1.5,alpha:(.60+d*.52)*fade*(1-c*.36)});

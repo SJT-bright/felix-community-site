@@ -16,6 +16,8 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
   let seed=7367; const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0; return seed/4294967296;};
   const resources = []; const keep=x=>(resources.push(x),x);
   const bandWidth=Math.min(1.6,Math.max(.9,Number(config.portalBandWidth)||1.38));
+  const travelSpeed=Math.min(.18,Math.max(.04,Number(config.streamTravelSpeed)||.095));
+  const spiralTwist=Math.min(2.2,Math.max(.5,Number(config.streamSpiralTwist)||1.4));
   const start = new THREE.Color(config.colors.start), end = new THREE.Color(config.colors.end);
   const uniforms = {uTime:{value:0},uProgress:{value:0},uColor:{value:start.clone()},uDpr:{value:renderer.getPixelRatio()},uSpeed:{value:1},uMobile:{value:small?1:0},uSafeTop:{value:0},uPointer:{value:new THREE.Vector2()},uHeat:{value:0}};
   const portal = new THREE.Group(); scene.add(portal);
@@ -23,7 +25,7 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
   // sparse dark gaps, inward spirals, and a close foreground stream.
   const pointFragment = `varying float vAlpha;varying vec3 vColor;void main(){float d=length(gl_PointCoord-.5)*2.;if(d>1.)discard;float light=exp(-d*d*4.8);gl_FragColor=vec4(vColor,light*vAlpha);}`;
   const glowFragment = `varying float vAlpha;varying vec3 vColor;void main(){float d=length(gl_PointCoord-.5)*2.;if(d>1.)discard;float halo=exp(-d*d*3.2);float core=exp(-d*d*24.);vec3 color=mix(vColor,vec3(1.,.98,.88),core*.58);gl_FragColor=vec4(color,vAlpha*(halo*.23+core*.82));}`;
-  const hazeFragment = `varying float vAlpha;varying vec3 vColor;void main(){float d=length(gl_PointCoord-.5)*2.;if(d>1.)discard;gl_FragColor=vec4(vColor,exp(-d*d*2.7)*vAlpha);}`;
+  const hazeFragment = `varying float vAlpha;varying vec3 vColor;void main(){float d=length(gl_PointCoord-.5)*2.;if(d>1.)discard;gl_FragColor=vec4(vColor,exp(-d*d*9.)*vAlpha);}`;
   const layers=[
     {kind:'white',count:small?360:620},
     {kind:'whiteGlow',count:small?500:800},
@@ -76,17 +78,17 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
         p=vec3(cos(a)*r,sin(a)*r,.08);
         vAlpha=${kind==='white'?'(.34+aSeed.z*.55)':'(.04+aSeed.z*.065)'}*(.82+.18*sin(a*4.-t));
       `:kind==='goldRing'?`
-        a+=t*.10;
+        a+=t*(.10+.045*(1.-aSeed.y))+aSeed.y*.28;
         float lens=pow(abs(sin(a)),.78);
         r=2.31+pow(aSeed.y,1.22)*(1.00+.18*lens)+sin(a*7.-t*.27)*.035;
         p=vec3(cos(a)*r,sin(a)*r,0.);
         vAlpha=(.27+.65*lens)*(.49+aSeed.z*.51)*(1.-aSeed.y*.40);
       `:kind==='halo'?`
-        a+=t*.10;
+        a+=t*(.085+.035*(1.-aSeed.y))+aSeed.y*.22;
         float lens=pow(abs(sin(a)),.65);
         r=2.25+pow(aSeed.y,1.08)*(1.78+.28*lens);
         p=vec3(cos(a)*r,sin(a)*r,-.025);
-        vAlpha=(.042+.16*lens)*(.55+.45*aSeed.z)*(1.-aSeed.y*.60);
+        vAlpha=(.035+.12*lens)*(.55+.45*aSeed.z)*(1.-aSeed.y*.60);
       `:kind==='disk'?`
         // Twelve narrow curved tracks read as orbital flow, rather than sand.
         float lane=floor(aSeed.z*12.);
@@ -105,11 +107,12 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
         vAlpha=smoothstep(0.,.10,life)*(1.-smoothstep(.86,1.,life))*(.58+aSeed.w*.52)*(.45+life*1.3)*exp(-aTrail*.53);
       `:kind==='ribbon'?`
         // The rear flow fans into curved, angled filaments at both ends.
-        float x=(aSeed.x-.5)*22.;
+        float life=fract(aSeed.x-t*(${(travelSpeed*.60).toFixed(3)}+aSeed.w*.012));
+        float x=(life-.5)*22.;
         float reach=abs(x);
         float wing=smoothstep(3.5,10.,reach);
         float lane=floor(aSeed.z*7.)-3.;
-        float offset=lane*(.075+.22*wing*wing)+(aSeed.y-.5)*(.18+.42*wing);
+        float offset=lane*(.075+.22*wing*wing)+(aSeed.y-.5)*(.18+.42*wing)+sin(x*${spiralTwist.toFixed(3)}-t*.65+aSeed.z*6.283185)*(.09+.12*wing);
         float curve=.014*x*x+sin(x*.42-t*.16)*.085+sign(x)*.42*wing*wing;
         p=vec3(x,-.15+curve+offset,-.24+(aSeed.z-.5)*.30);
         p.xy=mat2(.925,.38,-.38,.925)*p.xy;
@@ -125,14 +128,16 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
         p.xy=mat2(.925,.38,-.38,.925)*p.xy;
         vAlpha=(.45+aSeed.z*.30)*smoothstep(2.8,3.8,reach)*(1.-smoothstep(9.1,10.8,reach));
       `:kind==='front'?`
-        // A thick, layered near-camera stream crosses the dark center.
-        float life=fract(aSeed.x-t*(.095+aSeed.w*.018));
+        // Particles translate across the dark center while orbiting their flow axis.
+        float life=fract(aSeed.x-t*(${travelSpeed.toFixed(3)}+aSeed.w*.018));
         float x=(life-.5)*16.8;
         float wing=smoothstep(3.2,8.4,abs(x));
-        float breadth=mix(${(bandWidth*.78).toFixed(3)},${bandWidth.toFixed(3)},aSeed.z)+.23*smoothstep(2.5,8.4,abs(x));
-        float spread=(aSeed.y-.5)*breadth+(floor(aSeed.z*7.)-3.)*.09*wing*wing;
+        float breadth=${bandWidth.toFixed(3)}+.23*smoothstep(2.5,8.4,abs(x));
+        float radius=sqrt(aSeed.y)*breadth*.5;
+        float phase=aSeed.z*6.283185+x*${spiralTwist.toFixed(3)}-t*.65;
+        float spread=radius*cos(phase)+(floor(aSeed.z*7.)-3.)*.09*wing*wing;
         float arch=.020*x*x+sign(x)*.33*wing*wing;
-        p=vec3(x,-.13+arch+spread+sin(x*.46-t*.20)*.065,1.24+(aSeed.z-.5)*.34);
+        p=vec3(x,-.13+arch+spread+sin(x*.46-t*.20)*.065,1.24+radius*sin(phase)*.42);
         p.xy=mat2(.925,.38,-.38,.925)*p.xy;
         vAlpha=(.60+aSeed.w*.52)*(1.-smoothstep(6.7,8.4,abs(x)))*mix(1.,.64,aSeed.z);
       `:`
@@ -148,7 +153,7 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
       vec2 screen=gl_Position.xy/gl_Position.w;vec2 delta=screen-uPointer;
       float focus=exp(-dot(delta,delta)*22.)*uHeat;
       gl_Position.xy+=normalize(delta+vec2(.001))*focus*.018*gl_Position.w;
-      gl_PointSize=clamp((${kind==='white'?'2.4+aSeed.z*2.0':kind==='whiteGlow'?'5.+aSeed.z*3.':kind==='halo'?'8.+aSeed.z*5.':kind==='goldRing'?'4.5+aSeed.z*2.2':kind==='front'?'3.2+aSeed.w*2.6':kind==='ribbon'?'3.3+aSeed.w*2.4':kind==='wing'?'3.2+aSeed.z*1.7':dark?'2.2+aSeed.z*1.8':'2.4+aSeed.z*1.7'})*uDpr*13./max(1.,-mv.z),.8,${kind==='whiteGlow'?'8.':white?'4.7':dark?'4.':kind==='halo'?'14.':kind==='front'||kind==='ribbon'?'6.8':kind==='wing'?'5.5':kind==='goldRing'?'7.5':'4.8'});
+      gl_PointSize=clamp((${kind==='white'?'2.4+aSeed.z*2.0':kind==='whiteGlow'?'5.+aSeed.z*3.':kind==='halo'?'5.+aSeed.z*2.5':kind==='goldRing'?'4.5+aSeed.z*2.2':kind==='front'?'3.2+aSeed.w*2.6':kind==='ribbon'?'3.3+aSeed.w*2.4':kind==='wing'?'3.2+aSeed.z*1.7':dark?'2.2+aSeed.z*1.8':'2.4+aSeed.z*1.7'})*uDpr*13./max(1.,-mv.z),.8,${kind==='whiteGlow'?'8.':white?'4.7':dark?'4.':kind==='halo'?'8.':kind==='front'||kind==='ribbon'?'6.8':kind==='wing'?'5.5':kind==='goldRing'?'7.5':'4.8'});
       vAlpha*=mix(smoothstep(-.70,-.28,screen.x),1.,uMobile);
       vColor=${white?'vec3(1.)':dark?'vec3(.005,.003,.001)':'mix(vec3(1.,.95,.80),uColor,.29)'};
       }`,fragmentShader:white||dark?pointFragment:kind==='halo'?hazeFragment:glowFragment}));
@@ -178,24 +183,9 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
       float shoulder=exp(-pow((n-path)/(.52+.055*abs(s)),2.))*(1.-smoothstep(7.6,11.,abs(s)));
       float squeeze=exp(-pow((abs(s)-3.85)/1.65,2.))*exp(-pow((n-path)/(.78+.11*abs(s)),2.));
       float texture=.92+.08*sin(vP.x*7.+uTime*.31)*sin(vP.y*11.-uTime*.23);
-      float light=(corona*.34+aura*.13+streak*.18+shoulder*.065+squeeze*.10)*texture;
+      float light=(corona*.30+aura*.055+streak*.15+shoulder*.035+squeeze*.07)*texture;
       gl_FragColor=vec4(mix(uColor,vec3(1.,.96,.82),.75),light);
     }`,0.,.5);
-  // Broad, turbulent accretion haze gives the ring volume without flattening its particles.
-  addFlowGlow(`varying vec2 vP;uniform float uTime;uniform vec3 uColor;
-    float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-    float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.)),f.x),f.y);}
-    void main(){
-      float r=length(vP),a=atan(vP.y,vP.x),side=pow(abs(cos(a)),3.);
-      float swirl=a*1.9-r*.94-uTime*.055;
-      float texture=noise(vec2(swirl*3.,r*5.))* .55+noise(vec2(swirl*7.,r*11.))* .30+noise(vP*19.)*.15;
-      float ring=smoothstep(2.10,2.38,r)*(1.-smoothstep(3.55,4.45,r));
-      float compressed=exp(-pow((r-(3.25+side*.37))/.94,2.))*side;
-      float fissure=.63+.37*sin(swirl*5.+texture*8.);
-      float density=(ring*.20+compressed*.095)*pow(texture,1.8)*fissure;
-      vec3 blue=vec3(.28,.43,.69);vec3 color=mix(blue,mix(uColor,vec3(1.,.92,.75),.45),smoothstep(2.45,3.15,r));
-      gl_FragColor=vec4(color,density);
-    }`,-.20,.4);
   addFlowGlow(`varying vec2 vP;uniform float uTime;uniform vec3 uColor;
     void main(){
       float s=dot(vP,vec2(.925,.38)),n=dot(vP,vec2(-.38,.925));

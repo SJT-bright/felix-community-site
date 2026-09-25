@@ -7,6 +7,9 @@ export const CONFIG = {
   slowSpeed: 0.08,
   // 穿过黑洞的前景粒子带宽度，场景单位；黑洞直径约 4.08，1.38 约为其三分之一。
   portalBandWidth: 1.38,
+  // 粒子沿光带平移的速度、绕轴螺旋的密度；数值越大越快、越紧。
+  streamTravelSpeed: 0.095,
+  streamSpiralTwist: 1.4,
   colors: { start: '#f4bd66', end: '#e9933d' },
   // 改成目标网站真实的页面地址或锚点；组件上的 data-* 属性可逐项覆盖。
   links: { home: '#about', projects: '#projects', archive: '#archive', contact: '#contact' },
