@@ -5,6 +5,8 @@ export const CONFIG = {
   intro: '我用 AI 做影像，也做真正能用的产品。',
   secondIntro: '从影像、视觉，到网站与 Agent。\n让灵感走出脑海，成为可以看见、可以使用的作品。',
   slowSpeed: 0.08,
+  // 穿过黑洞的前景粒子带宽度，场景单位；黑洞直径约 4.08，1.38 约为其三分之一。
+  portalBandWidth: 1.38,
   colors: { start: '#f4bd66', end: '#e9933d' },
   // 改成目标网站真实的页面地址或锚点；组件上的 data-* 属性可逐项覆盖。
   links: { home: '#about', projects: '#projects', archive: '#archive', contact: '#contact' },

@@ -75,6 +75,7 @@ if(!customElements.get('felix-opening'))customElements.define('felix-opening',Fe
 function createCanvasParticles(canvas,config,onReady){
   const ctx=canvas.getContext('2d',{alpha:true});
   if(!ctx)throw new Error('Canvas 2D unavailable');
+  const bandWidth=Math.min(1.6,Math.max(.9,Number(config.portalBandWidth)||1.38));
   let w=1,h=1,dpr=1,frame=0,last=0,time=0,speed=1,progress=0,target=0,holding=false,active=true,disposed=false;
   let pointerX=0,pointerY=0,heat=0,rendered=false;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -86,7 +87,7 @@ function createCanvasParticles(canvas,config,onReady){
   const infall=Array.from({length:450},()=>[random(),random(),random(),random()]);
   const ribbon=Array.from({length:2300},()=>[random(),random(),random(),random()]);
   const wing=Array.from({length:720},(_,i)=>{const perSide=360,index=i%perSide,lane=index%4,step=Math.floor(index/4);return [(step+random()*.4)/90,(lane+random()*.12)/4,random(),i<perSide ? .25 : .75];});
-  const front=Array.from({length:1700},()=>[random(),random(),random(),random()]);
+  const front=Array.from({length:2200},()=>[random(),random(),random(),random()]);
   const dark=Array.from({length:125},()=>[random(),random(),random(),random()]);
   const stars=Array.from({length:170},()=>[random(),random(),random()]);
   const rgb=hex=>hex.match(/[0-9a-f]{2}/gi).map(v=>parseInt(v,16));
@@ -126,7 +127,7 @@ function createCanvasParticles(canvas,config,onReady){
       light.addColorStop(0,`rgba(${warm},0)`);light.addColorStop(.2,`rgba(${warm},${strength})`);
       light.addColorStop(.5,`rgba(${warm},${strength*1.25})`);light.addColorStop(.8,`rgba(${warm},${strength})`);
       light.addColorStop(1,`rgba(${warm},0)`);
-    ctx.save();ctx.globalCompositeOperation='lighter';ctx.strokeStyle=light;ctx.lineWidth=radius*(near?.13:.24);
+      ctx.save();ctx.globalCompositeOperation='lighter';ctx.strokeStyle=light;ctx.lineWidth=radius*(near?bandWidth/3:.24);
       ctx.lineCap='round';ctx.shadowColor=`rgba(${warm},.48)`;ctx.shadowBlur=radius*.13;
       ctx.beginPath();for(let i=0;i<=48;i++){
         const x=-extent+extent*2*i/48,[sx,sy]=project(x,flowY(x));
@@ -183,11 +184,11 @@ function createCanvasParticles(canvas,config,onReady){
     for(const [a,b,c,d] of front){
       const life=((a-time*(.095+d*.018))%1+1)%1,x=(life-.5)*16.8;
       const wing=smooth(3.2,8.4,Math.abs(x));
-      const breadth=.24+c*.61+.16*Math.min(1,Math.max(0,(Math.abs(x)-2.5)/5.9));
+      const breadth=bandWidth*(.78+.22*c)+.23*Math.min(1,Math.max(0,(Math.abs(x)-2.5)/5.9));
       const spread=(b-.5)*breadth+(Math.floor(c*7)-3)*.09*wing*wing;
       const y=-.13+.020*x*x+Math.sign(x)*.33*wing*wing+spread+Math.sin(x*.46-time*.20)*.065;
       const fade=1-Math.min(1,Math.max(0,(Math.abs(x)-6.7)/1.7));
-      points.push({pos:project(x,y,0),depth:1,size:1.8+d*1.5,alpha:(.58+d*.50)*fade*(1-c*.56)});
+      points.push({pos:project(x,y,0),depth:1,size:1.8+d*1.5,alpha:(.60+d*.52)*fade*(1-c*.36)});
     }
     const particle=p=>{
       let [x,y,k]=p.pos,alpha=p.alpha;

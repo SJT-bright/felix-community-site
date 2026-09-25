@@ -15,6 +15,7 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
   camera.position.set(0,0,13);
   let seed=7367; const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0; return seed/4294967296;};
   const resources = []; const keep=x=>(resources.push(x),x);
+  const bandWidth=Math.min(1.6,Math.max(.9,Number(config.portalBandWidth)||1.38));
   const start = new THREE.Color(config.colors.start), end = new THREE.Color(config.colors.end);
   const uniforms = {uTime:{value:0},uProgress:{value:0},uColor:{value:start.clone()},uDpr:{value:renderer.getPixelRatio()},uSpeed:{value:1},uMobile:{value:small?1:0},uSafeTop:{value:0},uPointer:{value:new THREE.Vector2()},uHeat:{value:0}};
   const portal = new THREE.Group(); scene.add(portal);
@@ -32,7 +33,7 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
     {kind:'infall',count:small?1200:3000},
     {kind:'ribbon',count:small?3800:8000},
     {kind:'wing',count:small?1600:3400},
-    {kind:'front',count:small?4000:8200},
+    {kind:'front',count:small?5200:10800},
     {kind:'dark',count:small?180:300},
   ];
   function particleLayer({kind,count}){
@@ -128,12 +129,12 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
         float life=fract(aSeed.x-t*(.095+aSeed.w*.018));
         float x=(life-.5)*16.8;
         float wing=smoothstep(3.2,8.4,abs(x));
-        float breadth=mix(.31,1.03,aSeed.z)+.23*smoothstep(2.5,8.4,abs(x));
+        float breadth=mix(${(bandWidth*.78).toFixed(3)},${bandWidth.toFixed(3)},aSeed.z)+.23*smoothstep(2.5,8.4,abs(x));
         float spread=(aSeed.y-.5)*breadth+(floor(aSeed.z*7.)-3.)*.09*wing*wing;
         float arch=.020*x*x+sign(x)*.33*wing*wing;
         p=vec3(x,-.13+arch+spread+sin(x*.46-t*.20)*.065,1.24+(aSeed.z-.5)*.34);
         p.xy=mat2(.925,.38,-.38,.925)*p.xy;
-        vAlpha=(.58+aSeed.w*.50)*(1.-smoothstep(6.7,8.4,abs(x)))*mix(1.,.44,aSeed.z);
+        vAlpha=(.60+aSeed.w*.52)*(1.-smoothstep(6.7,8.4,abs(x)))*mix(1.,.64,aSeed.z);
       `:`
         // Dark flecks interrupt the bright middle tracks, never the white ring.
         float lane=floor(aSeed.z*12.);
@@ -200,10 +201,10 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
       float s=dot(vP,vec2(.925,.38)),n=dot(vP,vec2(-.38,.925));
       float wing=smoothstep(3.2,8.4,abs(s));
       float path=-.13+.020*s*s+sin(s*.46-uTime*.20)*.065+sign(s)*.33*wing*wing;
-      float core=exp(-pow((n-path)/(.10+.012*abs(s)),2.));
-      float bloom=exp(-pow((n-path)/(.28+.025*abs(s)),2.));
+      float core=exp(-pow((n-path)/(${(bandWidth*.145).toFixed(3)}+.012*abs(s)),2.));
+      float bloom=exp(-pow((n-path)/(${(bandWidth*.38).toFixed(3)}+.025*abs(s)),2.));
       float fade=1.-smoothstep(6.7,8.4,abs(s));
-      gl_FragColor=vec4(mix(uColor,vec3(1.,.97,.86),.78),(core*.17+bloom*.055)*fade);
+      gl_FragColor=vec4(mix(uColor,vec3(1.,.97,.86),.78),(core*.16+bloom*.075)*fade);
     }`,1.12,1.5);
   // Distant tracks vanish behind the event horizon; the front streams have z > 1.
   const core=new THREE.Mesh(keep(new THREE.CircleGeometry(2.04,128)),keep(new THREE.MeshBasicMaterial({color:0x000000,depthWrite:true})));
