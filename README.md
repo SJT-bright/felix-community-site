@@ -1,6 +1,6 @@
-# 司钧霆 Felix · 求职作品集
+# Felix · AI 共创社群网站
 
-独立的个人求职网站，展示个人简介、项目实践、视觉审美参考、GitHub 开发项目与星空影像馆。上方八个外部网站为欣赏与参考选集，不作为本人开发成果；下方为个人实用项目，保留公开与私有状态的区分。
+面向 CUPK 同学的 AI 学习与共创网站，包含黑洞视频序章、动态粒子黑洞首页、视觉作品、项目展示、星空影像馆和 AI 共创社群页面。八个外部视觉网站仅作为审美参考选集，不作为本人开发成果。
 
 ## 本地运行
 
@@ -15,15 +15,16 @@ npm run dev
 
 ## 内容维护
 
-- 经历与求职联系方式：`src/data/career.js`
-- 首屏介绍：`src/components/ProfileLanding.jsx`
+- 黑洞视频和页面衔接：`src/components/OpeningSequence.jsx`
+- 动态粒子黑洞：`public/felix-opening/scene.js`；Canvas 备用实现：`public/felix-opening/opening.js`
 - 网站作品：`src/data/projectItems.js`
 - GitHub 项目：`src/data/githubProjects.js`
 - 影像馆：`public/portfolio/collection.js`，已收录 34 张，不设置空位。
+- 社群内容：`src/data/community.js`、`src/pages/LabPage.jsx`
 
-首次访问先播放可跳过的黑洞视频，随后进入新粒子黑洞首页，下滑经过星空过渡进入原个人介绍。站内导航与影像馆返回不重复播放。接入细节参见《新首页接入说明.md》。作品资料沿用 Felix 提供的真实内容；个人净利润与团队成交额分别列示，不相加。尚未提供的专业、毕业时间、到岗时间等信息没有编造。
+首次访问先播放黑洞视频，随后进入动态粒子黑洞首页；下滑进入星空视觉作品与项目展示。站内导航与影像馆返回不重复播放视频。社群详情位于 `/lab`。
 
-本目录是完整独立副本，不依赖其他项目目录或符号链接。修改此版本不会影响其他网站。本次仅提供本地预览和静态构建，尚未发布到公网。
+本目录是完整独立源码，不依赖其他项目目录或符号链接。GitHub 仓库用于存放源码，不等同于网站已部署上线。
 
 ## WorkBuddy 部署
 

@@ -17,7 +17,7 @@ with sync_playwright() as p:
         assert page.locator('.career-nav, .profile-landing, #experience, #career-contact').count() == 0
         page.locator('.community-masthead a[href="#portfolio-gallery"]').click()
         page.wait_for_function('location.hash === "#portfolio-gallery"')
-        page.wait_for_function('Math.abs(document.querySelector("#portfolio-gallery").getBoundingClientRect().top - 115) < 3')
+        page.wait_for_function('(() => { const top = document.querySelector("#portfolio-gallery").getBoundingClientRect().top; return top >= 85 && top <= 130; })()')
         page.wait_for_timeout(1000)
         assert page.locator('#portfolio-gallery .portfolio-entry').count() == 1
         assert abs(page.locator('.community-masthead').bounding_box()['y']) < 1

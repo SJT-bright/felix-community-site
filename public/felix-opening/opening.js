@@ -80,8 +80,8 @@ function createCanvasParticles(canvas,config,onReady){
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   let seed=7367;const random=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);
   const white=Array.from({length:700},(_,i)=>[(i+random()*.45)/700,random(),random(),random()]);
-  const goldRing=Array.from({length:1600},(_,i)=>[(i+random()*.45)/1600,random(),random(),random()]);
-  const haze=Array.from({length:800},(_,i)=>[(i+random()*.45)/800,random(),random(),random()]);
+  const goldRing=Array.from({length:2200},(_,i)=>[(i+random()*.45)/2200,random(),random(),random()]);
+  const haze=Array.from({length:1100},(_,i)=>[(i+random()*.45)/1100,random(),random(),random()]);
   const disk=Array.from({length:1400},()=>[random(),random(),random(),random()]);
   const infall=Array.from({length:450},()=>[random(),random(),random(),random()]);
   const ribbon=Array.from({length:2300},()=>[random(),random(),random(),random()]);
@@ -102,15 +102,15 @@ function createCanvasParticles(canvas,config,onReady){
     const color=start.map((v,i)=>Math.round(v+(end[i]-v)*tint)).join(',');
     const warm=start.map((v,i)=>Math.round([255,244,215][i]*.71+(v+(end[i]-v)*tint)*.29)).join(',');
     ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
-    const halo=ctx.createRadialGradient(cx,cy,radius*.3,cx,cy,radius*2.2);
-    halo.addColorStop(0,`rgba(${color},.08)`);halo.addColorStop(1,`rgba(${color},0)`);
+    const halo=ctx.createRadialGradient(cx,cy,radius*.72,cx,cy,radius*2.6);
+    halo.addColorStop(0,`rgba(${color},.07)`);halo.addColorStop(.4,`rgba(${color},.09)`);halo.addColorStop(1,`rgba(${color},0)`);
     ctx.fillStyle=halo;ctx.fillRect(0,0,w,h);
     for(const [x,y,b] of stars){ctx.fillStyle=`rgba(${color},${.12+b*.3})`;ctx.fillRect(x*w,y*h,.6+b,.6+b);}
     const project=(x,y,z)=>{const k=1;return [cx+(x*.925+y*.38)*radius/3,cy+(y*.925-x*.38)*radius/3,k];};
     const smooth=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t);};
-    const corona=ctx.createRadialGradient(cx,cy,radius*.66,cx,cy,radius*1.16);
+    const corona=ctx.createRadialGradient(cx,cy,radius*.68,cx,cy,radius*1.48);
     corona.addColorStop(0,`rgba(${warm},0)`);corona.addColorStop(.25,`rgba(${warm},.04)`);
-    corona.addColorStop(.44,`rgba(${warm},.16)`);corona.addColorStop(.7,`rgba(${warm},.055)`);
+    corona.addColorStop(.48,`rgba(${warm},.14)`);corona.addColorStop(.72,`rgba(${warm},.07)`);
     corona.addColorStop(1,`rgba(${warm},0)`);
     ctx.globalCompositeOperation='lighter';ctx.fillStyle=corona;ctx.fillRect(0,0,w,h);
     const drawGlowFlow=near=>{
@@ -126,7 +126,7 @@ function createCanvasParticles(canvas,config,onReady){
       light.addColorStop(0,`rgba(${warm},0)`);light.addColorStop(.2,`rgba(${warm},${strength})`);
       light.addColorStop(.5,`rgba(${warm},${strength*1.25})`);light.addColorStop(.8,`rgba(${warm},${strength})`);
       light.addColorStop(1,`rgba(${warm},0)`);
-      ctx.save();ctx.globalCompositeOperation='lighter';ctx.strokeStyle=light;ctx.lineWidth=radius*(near?.09:.13);
+    ctx.save();ctx.globalCompositeOperation='lighter';ctx.strokeStyle=light;ctx.lineWidth=radius*(near?.13:.24);
       ctx.lineCap='round';ctx.shadowColor=`rgba(${warm},.48)`;ctx.shadowBlur=radius*.13;
       ctx.beginPath();for(let i=0;i<=48;i++){
         const x=-extent+extent*2*i/48,[sx,sy]=project(x,flowY(x));
@@ -141,13 +141,13 @@ function createCanvasParticles(canvas,config,onReady){
     }
     for(const [a,b,c,d] of goldRing){
       const angle=a*Math.PI*2+time*.10,lens=Math.pow(Math.abs(Math.sin(angle)),.78);
-      const r=2.31+Math.pow(b,1.35)*(.48+.08*lens)+Math.sin(angle*7-time*.27)*.018;
-      points.push({pos:project(Math.cos(angle)*r,Math.sin(angle)*r,0),depth:0,size:1.8+c*1.5,alpha:(.24+.78*lens)*(.51+d*.49)*(1-b*.27)});
+      const r=2.31+Math.pow(b,1.22)*(1.00+.18*lens)+Math.sin(angle*7-time*.27)*.035;
+      points.push({pos:project(Math.cos(angle)*r,Math.sin(angle)*r,0),depth:0,size:1.8+c*1.5,alpha:(.27+.65*lens)*(.49+d*.51)*(1-b*.40)});
     }
     for(const [a,b,c,d] of haze){
       const angle=a*Math.PI*2+time*.10,lens=Math.pow(Math.abs(Math.sin(angle)),.65);
-      const r=2.25+Math.pow(b,1.18)*(.80+.12*lens);
-      points.push({pos:project(Math.cos(angle)*r,Math.sin(angle)*r,0),depth:0,size:3+c*2.4,alpha:(.038+.14*lens)*(.55+.45*d)*(1-b*.38),haze:true});
+      const r=2.25+Math.pow(b,1.08)*(1.78+.28*lens);
+      points.push({pos:project(Math.cos(angle)*r,Math.sin(angle)*r,0),depth:0,size:3+c*2.4,alpha:(.042+.16*lens)*(.55+.45*d)*(1-b*.60),haze:true});
     }
     for(const [a,b,c,d] of disk){
       const lane=Math.floor(c*12),r=2.93+Math.pow(b,1.24)*4.67;

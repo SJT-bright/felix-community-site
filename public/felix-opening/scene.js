@@ -26,13 +26,13 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
   const layers=[
     {kind:'white',count:small?360:620},
     {kind:'whiteGlow',count:small?500:800},
-    {kind:'goldRing',count:small?1700:3200},
-    {kind:'halo',count:small?1000:2000},
-    {kind:'disk',count:small?2000:3500},
+    {kind:'goldRing',count:small?2500:5000},
+    {kind:'halo',count:small?1500:3100},
+    {kind:'disk',count:small?2600:4700},
     {kind:'infall',count:small?1200:3000},
-    {kind:'ribbon',count:small?3000:6200},
-    {kind:'wing',count:small?1200:2600},
-    {kind:'front',count:small?3200:6500},
+    {kind:'ribbon',count:small?3800:8000},
+    {kind:'wing',count:small?1600:3400},
+    {kind:'front',count:small?4000:8200},
     {kind:'dark',count:small?180:300},
   ];
   function particleLayer({kind,count}){
@@ -77,19 +77,19 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
       `:kind==='goldRing'?`
         a+=t*.10;
         float lens=pow(abs(sin(a)),.78);
-        r=2.31+pow(aSeed.y,1.35)*(.48+.08*lens)+sin(a*7.-t*.27)*.018;
+        r=2.31+pow(aSeed.y,1.22)*(1.00+.18*lens)+sin(a*7.-t*.27)*.035;
         p=vec3(cos(a)*r,sin(a)*r,0.);
-        vAlpha=(.24+.78*lens)*(.51+aSeed.z*.49)*(1.-aSeed.y*.27);
+        vAlpha=(.27+.65*lens)*(.49+aSeed.z*.51)*(1.-aSeed.y*.40);
       `:kind==='halo'?`
         a+=t*.10;
         float lens=pow(abs(sin(a)),.65);
-        r=2.25+pow(aSeed.y,1.18)*(.80+.12*lens);
+        r=2.25+pow(aSeed.y,1.08)*(1.78+.28*lens);
         p=vec3(cos(a)*r,sin(a)*r,-.025);
-        vAlpha=(.035+.13*lens)*(.55+.45*aSeed.z)*(1.-aSeed.y*.38);
+        vAlpha=(.042+.16*lens)*(.55+.45*aSeed.z)*(1.-aSeed.y*.60);
       `:kind==='disk'?`
         // Twelve narrow curved tracks read as orbital flow, rather than sand.
         float lane=floor(aSeed.z*12.);
-        r=2.93+pow(aSeed.y,1.24)*4.67;
+        r=2.78+pow(aSeed.y,1.24)*4.82;
         a=lane*6.283185/12.+(7.6-r)*.37+t*(.18+1.2/pow(r,1.4))+(aSeed.x-.5)*.04;
         p=vec3(cos(a)*r,sin(a)*r*.20+(aSeed.w-.5)*.09,sin(a)*.42);
         p.xy=mat2(.925,.38,-.38,.925)*p.xy;
@@ -108,7 +108,7 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
         float reach=abs(x);
         float wing=smoothstep(3.5,10.,reach);
         float lane=floor(aSeed.z*7.)-3.;
-        float offset=lane*(.065+.15*wing*wing)+(aSeed.y-.5)*(.12+.28*wing);
+        float offset=lane*(.075+.22*wing*wing)+(aSeed.y-.5)*(.18+.42*wing);
         float curve=.014*x*x+sin(x*.42-t*.16)*.085+sign(x)*.42*wing*wing;
         p=vec3(x,-.15+curve+offset,-.24+(aSeed.z-.5)*.30);
         p.xy=mat2(.925,.38,-.38,.925)*p.xy;
@@ -119,7 +119,7 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
         float reach=abs(x),wing=smoothstep(3.5,10.,reach);
         float lane=floor(aSeed.y*4.)-1.5;
         float curve=.014*x*x+sin(x*.42-t*.16)*.085+sign(x)*.42*wing*wing;
-        float offset=lane*(.08+.18*wing*wing)+(aSeed.z-.5)*.055;
+        float offset=lane*(.11+.29*wing*wing)+(aSeed.z-.5)*.075;
         p=vec3(x,-.15+curve+offset,-.12+(aSeed.z-.5)*.10);
         p.xy=mat2(.925,.38,-.38,.925)*p.xy;
         vAlpha=(.45+aSeed.z*.30)*smoothstep(2.8,3.8,reach)*(1.-smoothstep(9.1,10.8,reach));
@@ -128,7 +128,7 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
         float life=fract(aSeed.x-t*(.095+aSeed.w*.018));
         float x=(life-.5)*16.8;
         float wing=smoothstep(3.2,8.4,abs(x));
-        float breadth=mix(.24,.85,aSeed.z)+.16*smoothstep(2.5,8.4,abs(x));
+        float breadth=mix(.31,1.03,aSeed.z)+.23*smoothstep(2.5,8.4,abs(x));
         float spread=(aSeed.y-.5)*breadth+(floor(aSeed.z*7.)-3.)*.09*wing*wing;
         float arch=.020*x*x+sign(x)*.33*wing*wing;
         p=vec3(x,-.13+arch+spread+sin(x*.46-t*.20)*.065,1.24+(aSeed.z-.5)*.34);
@@ -167,18 +167,34 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
     void main(){
       float r=length(vP),vertical=pow(abs(vP.y)/max(r,.01),.7);
       float ripple=sin(atan(vP.y,vP.x)*7.-uTime*.24)*.025;
-      float corona=exp(-pow((r-2.42-ripple)/.27,2.))*(.20+.80*vertical);
-      float aura=exp(-pow((r-2.70)/.62,2.))*(.16+.84*vertical);
+      float corona=exp(-pow((r-2.49-ripple)/.42,2.))*(.26+.74*vertical);
+      float aura=exp(-pow((r-2.95)/.95,2.))*(.25+.75*vertical);
       float s=dot(vP,vec2(.925,.38)),n=dot(vP,vec2(-.38,.925));
       float wing=smoothstep(3.5,10.,abs(s));
       float path=-.15+.014*s*s+sin(s*.42-uTime*.16)*.085+sign(s)*.42*wing*wing;
-      float width=.15+.025*abs(s);
+      float width=.20+.035*abs(s);
       float streak=exp(-pow((n-path)/width,2.))*(1.-smoothstep(7.3,11.,abs(s)));
-      float shoulder=exp(-pow((n-path)/(.33+.032*abs(s)),2.))*(1.-smoothstep(7.6,11.,abs(s)));
+      float shoulder=exp(-pow((n-path)/(.52+.055*abs(s)),2.))*(1.-smoothstep(7.6,11.,abs(s)));
+      float squeeze=exp(-pow((abs(s)-3.85)/1.65,2.))*exp(-pow((n-path)/(.78+.11*abs(s)),2.));
       float texture=.92+.08*sin(vP.x*7.+uTime*.31)*sin(vP.y*11.-uTime*.23);
-      float light=(corona*.30+aura*.10+streak*.17+shoulder*.035)*texture;
+      float light=(corona*.34+aura*.13+streak*.18+shoulder*.065+squeeze*.10)*texture;
       gl_FragColor=vec4(mix(uColor,vec3(1.,.96,.82),.75),light);
     }`,0.,.5);
+  // Broad, turbulent accretion haze gives the ring volume without flattening its particles.
+  addFlowGlow(`varying vec2 vP;uniform float uTime;uniform vec3 uColor;
+    float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+    float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.)),f.x),f.y);}
+    void main(){
+      float r=length(vP),a=atan(vP.y,vP.x),side=pow(abs(cos(a)),3.);
+      float swirl=a*1.9-r*.94-uTime*.055;
+      float texture=noise(vec2(swirl*3.,r*5.))* .55+noise(vec2(swirl*7.,r*11.))* .30+noise(vP*19.)*.15;
+      float ring=smoothstep(2.10,2.38,r)*(1.-smoothstep(3.55,4.45,r));
+      float compressed=exp(-pow((r-(3.25+side*.37))/.94,2.))*side;
+      float fissure=.63+.37*sin(swirl*5.+texture*8.);
+      float density=(ring*.20+compressed*.095)*pow(texture,1.8)*fissure;
+      vec3 blue=vec3(.28,.43,.69);vec3 color=mix(blue,mix(uColor,vec3(1.,.92,.75),.45),smoothstep(2.45,3.15,r));
+      gl_FragColor=vec4(color,density);
+    }`,-.20,.4);
   addFlowGlow(`varying vec2 vP;uniform float uTime;uniform vec3 uColor;
     void main(){
       float s=dot(vP,vec2(.925,.38)),n=dot(vP,vec2(-.38,.925));
@@ -217,7 +233,7 @@ export function createScene(canvas, config, onFailure, onReady = () => {}) {
     portal.position.set(mobile?0:halfHeight*camera.aspect*.39,mobile?-halfHeight*(height<700?.37:.26):.12,progress*1.3);
     const scale=mobile?Math.min(width/height*1.02,height<700?.44:.58):Math.min(.92,width/height*.55);portal.scale.setScalar(scale*(1+progress*.10));
     camera.position.x=smoothed.x*.24;camera.position.y=smoothed.y*.15;camera.lookAt(0,0,0);
-    canvas.dataset.timeScale=speed.toFixed(3);canvas.dataset.progress=progress.toFixed(3);canvas.dataset.phase=progress>.7?'amber':'gold';canvas.dataset.particles=String(layers.reduce((sum,layer)=>sum+layer.count,0));canvas.dataset.particleLayers='white-inner,photon-corona,orbital-tracks,infall,rear-ribbon,angled-wings,front-stream,dark-flecks';canvas.dataset.sceneTime=time.toFixed(3);
+    canvas.dataset.timeScale=speed.toFixed(3);canvas.dataset.progress=progress.toFixed(3);canvas.dataset.phase=progress>.7?'amber':'gold';canvas.dataset.particles=String(layers.reduce((sum,layer)=>sum+layer.count,0));canvas.dataset.particleLayers='white-inner,thick-gold-ring,nebula-haze,compressed-side-streams,orbital-tracks,infall,rear-ribbon,angled-wings,front-stream,dark-flecks';canvas.dataset.sceneTime=time.toFixed(3);
     try{renderer.render(scene,camera);if(failed)return;if(!rendered){rendered=true;onReady();}}
     catch(error){fail(error);return;}
     if(!frame&&(!reduced.matches || Math.abs(progress-targetProgress)>.001))frame=requestAnimationFrame(render);
