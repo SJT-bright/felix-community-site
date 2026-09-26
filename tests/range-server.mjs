@@ -109,6 +109,13 @@ export function createRangeServer(siteRoot) {
 
     stat(resolved, (statError, info) => {
       if (!statError && info.isFile()) return serveFile(request, response, resolved, info);
+      if (!statError && info.isDirectory()) {
+        const directoryIndex = path.join(resolved, "index.html");
+        return stat(directoryIndex, (indexError, indexInfo) => {
+          if (indexError || !indexInfo.isFile()) return sendError(request, response, 404);
+          return serveFile(request, response, directoryIndex, indexInfo);
+        });
+      }
 
       const mayFallback =
         statError &&

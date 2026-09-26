@@ -212,6 +212,20 @@
   line-height: 1.75;
 }
 
+.github-projects__profile-link {
+  justify-self: start;
+  color: var(--color-profile-accent-soft);
+  text-decoration-color: currentColor;
+  text-underline-offset: 0.3em;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.github-projects__profile-link:hover,
+.github-projects__profile-link:focus-visible {
+  color: var(--color-text);
+  transform: translateX(0.2rem);
+}
+
 .github-projects__grid {
   display: grid;
   grid-template-columns: 1fr;

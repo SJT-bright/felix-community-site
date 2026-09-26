@@ -1,4 +1,4 @@
-import { githubProjects } from "../../data/githubProjects.js";
+import { githubProfile, githubProjects } from "../../data/githubProjects.js";
 
 const FINE_POINTER_QUERY = "(hover: hover) and (pointer: fine)";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
@@ -115,11 +115,15 @@ export default function GitHubProjectList({ projects = githubProjects }) {
           这里是我开发的应用、工具与项目：减少重复操作，整理知识与素材，让日常积累持续发挥作用。一次构建，反复使用，在长期使用中节省时间、沉淀经验。
         </p>
         <p className="github-projects__availability">公开项目提供源码入口，可按仓库说明与许可使用；私有项目仅作作品记录，不标为开源。</p>
+        <a className="github-projects__profile-link" href={githubProfile.url} target="_blank" rel="noreferrer noopener">
+          查看 {githubProfile.login} 的 GitHub 主页 ↗
+        </a>
       </header>
 
       <div className="github-projects__grid">
         {projects.map((project, index) => {
           const isPrivate = project.visibility === "private";
+          const CardTag = isPrivate ? "div" : "a";
 
           return (
             <article
@@ -127,12 +131,14 @@ export default function GitHubProjectList({ projects = githubProjects }) {
               key={project.name}
               style={{ "--github-project-delay": `${(index % 4) * 70}ms` }}
             >
-              <a
+              <CardTag
                 className="github-projects__link"
-                href={project.url}
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label={`${project.title}，${isPrivate ? "私有项目" : "公开项目"}，在新窗口打开 GitHub`}
+                {...(isPrivate ? {} : {
+                  href: project.url,
+                  target: "_blank",
+                  rel: "noreferrer noopener",
+                  "aria-label": `${project.title}，公开项目，在新窗口打开 GitHub`,
+                })}
                 onPointerMove={handleCardPointerMove}
                 onPointerLeave={resetCardMotion}
                 onPointerCancel={resetCardMotion}
@@ -158,7 +164,7 @@ export default function GitHubProjectList({ projects = githubProjects }) {
                         {isPrivate ? "私有" : "公开"}
                       </span>
                     </div>
-                    <p className="github-projects__repo-name">SJT-bright / {project.name}</p>
+                    <p className="github-projects__repo-name">{githubProfile.login} / {project.name}</p>
                     <p className="github-projects__description">{project.description}</p>
                   </div>
 
@@ -168,11 +174,11 @@ export default function GitHubProjectList({ projects = githubProjects }) {
                       {project.language}
                     </span>
                     <span className="github-projects__open-cue" aria-hidden="true">
-                      打开 GitHub ↗
+                      {isPrivate ? "源码未公开" : "打开 GitHub ↗"}
                     </span>
                   </footer>
                 </div>
-              </a>
+              </CardTag>
             </article>
           );
         })}
