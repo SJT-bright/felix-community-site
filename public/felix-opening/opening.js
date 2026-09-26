@@ -20,6 +20,18 @@ class FelixOpening extends HTMLElement {
       .signature{margin-top:8px;font-size:9px}
       .coordinates,.orbit-note,.edition{display:none}
       .bottom{bottom:12px}
+    }
+    @media (max-width:600px) and (max-height:650px){
+      .copy,.copy.second{top:49%;left:7%;width:86%;transform:translateY(calc(-42% - var(--drift)))}
+      .copy.second{transform:translateY(calc(-42% + (1 - var(--in))*16px))}
+      .copy h1{font-size:clamp(35px,9vw,50px);line-height:1.05}
+      .copy h2{font-size:clamp(31px,8vw,43px);line-height:1.08}
+      .eyebrow{margin-bottom:6px;font-size:8px}
+      .english{margin:5px 0 7px;font-size:14px}
+      .description{font-size:10px;line-height:1.35}
+      .signature{margin-top:6px;font-size:9px}
+      .coordinates,.orbit-note,.edition{display:none}
+      .bottom{bottom:8px}
     }</style>
     <section class="journey" aria-label="${brand} 作品集开场"><div class="stage">
       <div class="fallback" aria-hidden="true"></div><canvas class="scene" aria-hidden="true"></canvas><div class="veil" aria-hidden="true"></div><div class="grain" aria-hidden="true"></div>
