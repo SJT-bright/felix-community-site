@@ -40,6 +40,8 @@ export function createProjectVideoController({ root, video, win, doc }) {
       video.pause();
       return;
     }
+    // Project previews are visual; the shared soundtrack owns background audio.
+    video.muted = true;
 
     try {
       const playResult = video.play();
@@ -69,6 +71,7 @@ export function createProjectVideoController({ root, video, win, doc }) {
   };
 
   enableVideoBgm(video, 0.65);
+  video.muted = true;
   pause();
   doc.addEventListener("visibilitychange", onVisibilityChange);
   video.addEventListener("error", onMediaError);

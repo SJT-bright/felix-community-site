@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { startBgm } from "../lib/bgm.js";
 import "../styles/opening-sequence.css";
 
-const seenKey = "felix-community-intro-seen-v2";
+const seenKey = "felix-community-intro-seen-v3";
 function shouldPlay() {
   const mode = new URLSearchParams(location.search).get("intro");
   if (mode === "play") return true;
@@ -22,6 +22,7 @@ export default function OpeningSequence({ children }) {
     video.current?.play().then(() => setBlocked(false)).catch(() => setBlocked(true));
   };
   const finish = () => {
+    video.current?.pause();
     try { sessionStorage.setItem(seenKey, "1"); } catch { /* Storage is optional. */ }
     startBgm();
     setLeaving(true);
@@ -52,8 +53,8 @@ export default function OpeningSequence({ children }) {
       {children}
     </div>
     {playing && <section className={`career-intro${leaving ? " is-leaving" : ""}`} aria-label="黑洞开场视频" tabIndex={0} onClick={start} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); start(); } if (event.key === "Escape") finish(); }}>
-      <video ref={video} autoPlay muted={false} playsInline preload="auto" poster="/intro/wormhole-home-poster.jpg" onEnded={finish} onError={() => { setFailed(true); setBlocked(true); }}>
-        <source src="/intro/wormhole-home-with-audio.mp4" type="video/mp4" onError={() => { setFailed(true); setBlocked(true); }} />
+      <video ref={video} autoPlay muted={false} playsInline preload="auto" poster="/intro/website-opening-0926.jpg" onEnded={finish} onError={() => { setFailed(true); setBlocked(true); }}>
+        <source src="/intro/website-opening-0926.mp4" type="video/mp4" onError={() => { setFailed(true); setBlocked(true); }} />
       </video>
       {blocked && <p className="intro-center-hint" role="status">{failed ? "视频暂不可用 · 点击画面进入首页" : "点击画面，开启有声序章"}</p>}
     </section>}

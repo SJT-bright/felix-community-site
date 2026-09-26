@@ -1,5 +1,5 @@
 body.career-intro-active { overflow: hidden; }
-.community-masthead { position: fixed; top: 0; left: 5%; right: 5%; height: 100px; display: flex; align-items: center; justify-content: space-between; z-index: 100; background: #030711c9; backdrop-filter: blur(14px); border-bottom: 1px solid #bbd6f126; }
+.community-masthead { position: fixed; top: 0; left: 5%; right: 5%; height: 100px; display: flex; align-items: center; justify-content: space-between; z-index: 100; background: transparent; backdrop-filter: none; border-bottom: 1px solid #bbd6f126; text-shadow: 0 2px 12px #030711; }
 .community-masthead a { color: #e9eff5; text-decoration: none; }
 .community-brand { display: flex; align-items: center; gap: 20px; }
 .community-brand > span:first-child { font: italic 38px Didot, Georgia, serif; }
