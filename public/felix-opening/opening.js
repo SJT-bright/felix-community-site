@@ -8,7 +8,19 @@ class FelixOpening extends HTMLElement {
     const links=Object.fromEntries(Object.entries(CONFIG.links).map(([key,value])=>[key,safeLink(this.dataset[key]||value)]));
     const brand=esc(CONFIG.name),chineseName=esc(CONFIG.chineseName);
     shadow.innerHTML=`<link rel="stylesheet" href="${new URL('./opening.css',import.meta.url)}">
-    <style>:host([data-integrated]){background:transparent}:host([data-integrated]) .stage{background:transparent}:host([data-integrated]) .veil{background:linear-gradient(90deg,#03071138,transparent 60%)}:host([data-integrated]) .handoff,:host([data-integrated]) .masthead{display:none}</style>
+    <style>:host([data-integrated]){background:transparent}:host([data-integrated]) .stage{background:transparent}:host([data-integrated]) .veil{background:linear-gradient(90deg,#03071138,transparent 60%)}:host([data-integrated]) .handoff,:host([data-integrated]) .masthead{display:none}
+    @media (min-width:601px) and (max-height:650px){
+      .copy,.copy.second{top:50%;left:7%;width:52%;transform:translateY(calc(-42% - var(--drift)))}
+      .copy.second{transform:translateY(calc(-42% + (1 - var(--in))*16px))}
+      .copy h1{font-size:clamp(40px,5vw,58px);line-height:1.06}
+      .copy h2{font-size:clamp(34px,4vw,48px);line-height:1.1}
+      .eyebrow{margin-bottom:8px;font-size:8px}
+      .english{margin:8px 0 10px;font-size:clamp(15px,2vw,22px)}
+      .description{font-size:10px;line-height:1.45}
+      .signature{margin-top:8px;font-size:9px}
+      .coordinates,.orbit-note,.edition{display:none}
+      .bottom{bottom:12px}
+    }</style>
     <section class="journey" aria-label="${brand} 作品集开场"><div class="stage">
       <div class="fallback" aria-hidden="true"></div><canvas class="scene" aria-hidden="true"></canvas><div class="veil" aria-hidden="true"></div><div class="grain" aria-hidden="true"></div>
       <header class="masthead"><a class="brand" href="${links.home}" aria-label="${brand} 个人介绍"><span class="brand-name">${brand}<i>⁎</i></span><span class="brand-sub">${chineseName}<br>INDEPENDENT CREATOR</span></a><nav class="nav" aria-label="作品集导航"><a href="${links.projects}">项目作品</a><a href="${links.archive}">星空影像馆</a><a class="contact" href="${links.contact}">联系</a><a class="skip" href="${links.home}">进入作品集 <span aria-hidden="true">↗</span></a></nav></header>
