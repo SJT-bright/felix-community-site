@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 52125",
-    "build": "vite build",
+    "build": "vite build && node scripts/finalize-static-routes.mjs",
     "preview": "npm run build && node preview-server.mjs",
     "test": "node --test tests/*.test.js",
     "test:browser": "python3 tests/community-browser.py",

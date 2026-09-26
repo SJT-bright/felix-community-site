@@ -10,6 +10,7 @@
 - 构建：`npm run build`。
 - 发布目录：`dist`。包内已有本次构建结果，也可以重新构建。
 - 首页：`/`；社群：`/lab`；星空影像馆：`/portfolio/index.html`。
+- 构建会生成 `dist/lab/index.html`，供不支持 SPA 回退的静态托管直接打开社群页；请连同整个 `dist` 发布，无需另建 Node 服务。
 - 请将网站挂载于域名根路径，保留整个 `dist/portfolio/` 和本地 `vendor/` 文件。
 - 真实文件优先于单页应用回退规则，不能把 `/portfolio/app.js`、图片或 `index.html` 重写成主站首页。
 - 不要部署 `node_modules`、测试目录或源码根目录。`preview-server.mjs` 仅用于本地验收，不作为云端启动服务。
