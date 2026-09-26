@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { startBgm } from "../lib/bgm.js";
 import "../styles/opening-sequence.css";
 
 const seenKey = "felix-community-intro-seen-v2";
@@ -22,6 +23,7 @@ export default function OpeningSequence({ children }) {
   };
   const finish = () => {
     try { sessionStorage.setItem(seenKey, "1"); } catch { /* Storage is optional. */ }
+    startBgm();
     setLeaving(true);
   };
   useEffect(() => {
@@ -29,7 +31,7 @@ export default function OpeningSequence({ children }) {
     import(/* @vite-ignore */ componentUrl).catch(error => console.error("Opening component unavailable", error));
   }, []);
   useEffect(() => {
-    if (!playing) return;
+    if (!playing) { startBgm(); return; }
     document.body.classList.add("career-intro-active");
     video.current?.play().catch(() => setBlocked(true));
     return () => { document.body.classList.remove("career-intro-active"); };
